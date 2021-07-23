@@ -1,3 +1,7 @@
 # Encierros_Dots
 
-Encierro DOTS is a game made with Unity3D DOTS.
+Encierros DOTS is a game made with Unity3D DOTS.
+
+## Authors
+
+Francisco Castañeda [@dragaus](https://github.com/dragaus)
