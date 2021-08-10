@@ -18,4 +18,8 @@ public struct CharaterData : IComponentData
     /// Speeed of rotation speed
     /// </summary>
     public float rotationSpeed;
+    /// <summary>
+    /// The current character is Alive
+    /// </summary>
+    public bool isAlive;
 }
