@@ -6,10 +6,17 @@ using Unity.Transforms;
 
 public class EntityFollower : MonoBehaviour
 {
+    SetUpManager setUpManager;
     Entity entityToFollow;
+
     public void SetEntityToFollow(Entity entity)
     {
         entityToFollow = entity;
+    }
+
+    public void SetSetUpManager(SetUpManager manager)
+    {
+        setUpManager = manager;
     }
 
     // Update is called once per frame
@@ -20,6 +27,12 @@ public class EntityFollower : MonoBehaviour
             try
             {
                 transform.position = World.DefaultGameObjectInjectionWorld.EntityManager.GetComponentData<Translation>(entityToFollow).Value;
+                GameDataManager.instance.characterMostBehind = transform.position.z;
+                if (GameDataManager.instance.GetNextSpawnPosition() <= transform.position.z)
+                {
+                    GameDataManager.instance.UpdateSpawnPosition();
+                    setUpManager.AddTile();
+                }
             }
             catch 
             {

@@ -11,8 +11,9 @@ public class SetUpManager : MonoBehaviour
     public GameObject characterPrefab;
     public GameObject tilePrefab;
     public int runners = 20;
-    public int initialTileAmount = 20;
+    public int initialTileAmount = 25;
     public List<GameObject> houses;
+    EntityManager manager;
 
     BlobAssetStore _blobAssetStore;
 
@@ -21,10 +22,10 @@ public class SetUpManager : MonoBehaviour
     {
         //Get all settings and prefabs ready for initialization
         _blobAssetStore = new BlobAssetStore();
-        var manager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        manager = World.DefaultGameObjectInjectionWorld.EntityManager;
         var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, _blobAssetStore);
         var characterEntity = GameObjectConversionUtility.ConvertGameObjectHierarchy(characterPrefab, settings);
-        var tileEntity = GameObjectConversionUtility.ConvertGameObjectHierarchy(tilePrefab, settings);
+        GameDataManager.instance.tile = GameObjectConversionUtility.ConvertGameObjectHierarchy(tilePrefab, settings);
         houses.ForEach((house) =>
         {
             var newHouse = GameObjectConversionUtility.ConvertGameObjectHierarchy(house, settings);
@@ -39,23 +40,7 @@ public class SetUpManager : MonoBehaviour
         GameDataManager.instance.leftHousePos = initialPos;
         for (int i = 0; i < initialTileAmount; i++)
         {
-            var entity = manager.Instantiate(tileEntity);
-            var position = new float3(0, 0, GameDataManager.instance.tileZPos);
-            manager.SetComponentData(entity, new Translation { Value = position });
-            manager.SetComponentData(entity, new Rotation { Value = quaternion.identity });
-
-            var maxHousePos = GameDataManager.instance.tileZPos + GameDataManager.instance.tileSize.z;
-            while (GameDataManager.instance.leftHousePos < maxHousePos)
-            {
-                AddHouses(ref GameDataManager.instance.leftHousePos, manager, -1);
-            }
-
-            while (GameDataManager.instance.rightHousePos < maxHousePos)
-            {
-                AddHouses(ref GameDataManager.instance.rightHousePos, manager, 1);
-            }
-
-            GameDataManager.instance.tileZPos += GameDataManager.instance.tileSize.z;
+            AddTile();
         }
 
         //Spawn Initial amount of characters
@@ -80,12 +65,34 @@ public class SetUpManager : MonoBehaviour
                 if (follower != null)
                 {
                     follower.SetEntityToFollow(entity);
+                    follower.SetSetUpManager(this);
                 }
             }
         }
     }
 
-    void AddHouses(ref float position, EntityManager manager, float direction)
+    public void AddTile()
+    {
+        var entity = manager.Instantiate(GameDataManager.instance.tile);
+        var position = new float3(0, 0, GameDataManager.instance.tileZPos);
+        manager.SetComponentData(entity, new Translation { Value = position });
+        manager.SetComponentData(entity, new Rotation { Value = quaternion.identity });
+
+        var maxHousePos = GameDataManager.instance.tileZPos + GameDataManager.instance.tileSize.z;
+        while (GameDataManager.instance.leftHousePos < maxHousePos)
+        {
+            AddHouses(ref GameDataManager.instance.leftHousePos, -1);
+        }
+
+        while (GameDataManager.instance.rightHousePos < maxHousePos)
+        {
+            AddHouses(ref GameDataManager.instance.rightHousePos, 1);
+        }
+
+        GameDataManager.instance.tileZPos += GameDataManager.instance.tileSize.z;
+    }
+
+    void AddHouses(ref float position, float direction)
     {
         var randomIndex = UnityEngine.Random.Range(0, GameDataManager.instance.houses.Count);
         var entityToAdd = GameDataManager.instance.houses[randomIndex];

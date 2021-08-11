@@ -17,13 +17,14 @@ public class StaticDestroyableSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        float farestDistance = GameDataManager.instance.characterMostBehind - (GameDataManager.instance.tileSize.z * 15);
         EntityCommandBuffer.ParallelWriter ecb = buffer.CreateCommandBuffer().AsParallelWriter();
 
         Entities
             .WithName("StaticDestroyableSystem")
             .ForEach((Entity entity, int entityInQueryIndex, ref StaticDestroybleData staticDestroybleData, ref Translation translation) =>
             {
-                if(GameDataManager.instance.characterMostBehaind - 12 > translation.Value.z)
+                if (farestDistance > translation.Value.z)
                 {
                     staticDestroybleData.shouldBeDestroy = true;
                 }

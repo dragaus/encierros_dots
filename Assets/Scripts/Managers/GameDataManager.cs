@@ -16,9 +16,23 @@ public class GameDataManager : MonoBehaviour
     [HideInInspector]
     public float rightHousePos;
     [HideInInspector]
+    public Entity tile;
+    [HideInInspector]
     public List<Entity> houses = new List<Entity>();
     [HideInInspector]
-    public float characterMostBehaind;
+    public float characterMostBehind;
+    [HideInInspector]
+    public float lastSpawnPosition;
+
+    public float GetNextSpawnPosition()
+    {
+        return lastSpawnPosition + tileSize.z;
+    }
+
+    public void UpdateSpawnPosition()
+    {
+        lastSpawnPosition += tileSize.z;
+    }
 
     // Start is called before the first frame update
     void Awake()
@@ -26,6 +40,4 @@ public class GameDataManager : MonoBehaviour
         if (instance == null) instance = this;
         else Destroy(gameObject);
     }
-
-
 }
